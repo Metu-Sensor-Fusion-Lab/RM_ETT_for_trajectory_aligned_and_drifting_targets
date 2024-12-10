@@ -38,7 +38,6 @@ Theta_k_k_minus_1 = 1;        % Initial orientation angle variance
 thetadot_k_k_minus_1 = 1e-3;  % Initial angular velocity prior
 Thetadot_k_k_minus_1 = 1;     % Initial angular velocity variance
 ThetaQ = 1e-2;                % Process noise for orientation angle dynamics
-rng(2)
 % Initial parameters for the Inverse-Gamma distribution governing the extent
 alpha_k_k_minus_1 = ones(d,1)*3;  % shape parameters
 beta_k_k_minus_1 = ones(d,1)*10;  % scale parameters

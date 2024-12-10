@@ -63,7 +63,11 @@ function [x_k_k, P_k_k, alpha_k_k, beta_k_k, theta_k_k, Theta_k_k, EX_k_k] =  dr
         % E_T_sGammaInv_TT is E[T*(sX)^{-1}*T^T] used in state update steps
         E_T_sGammaInv_TT = eTMT(TH*theta_k_k, TH*Theta_k_k*TH.' , E_sX_1,1);
 
-        
+        % Compute expected measurement error terms E_zzT for each measurement
+        for j=1:m_k
+            E_zzT(:,:,j) = H*P_k_k*H' + Sigma_k + (z_k(:,j) - H*x_k_k)*(z_k(:,j) - H*x_k_k)';
+            E_TT_zz_T(:,:,j) = eTMT(TH*theta_k_k, TH*Theta_k_k*TH.', E_zzT(:,:,j), 2);
+        end
 
         % Update q_x (State distribution)
         % Update state covariance (40a) and mean (40b)
@@ -77,11 +81,7 @@ function [x_k_k, P_k_k, alpha_k_k, beta_k_k, theta_k_k, Theta_k_k, EX_k_k] =  dr
             z_k(:,j) = Sigma_k*(E_T_sGammaInv_TT*H*x_k_k + R\Y_k(:,j));
         end
 
-        % Compute expected measurement error terms E_zzT for each measurement
-        for j=1:m_k
-            E_zzT(:,:,j) = H*P_k_k*H' + Sigma_k + (z_k(:,j) - H*x_k_k)*(z_k(:,j) - H*x_k_k)';
-            E_TT_zz_T(:,:,j) = eTMT(TH*theta_k_k, TH*Theta_k_k*TH.', E_zzT(:,:,j), 2);
-        end
+        
         % Update q_X (Extent parameters)
         % Update alpha_k_k and beta_k_k (21a & 21b)
         alpha_k_k = alpha_k_k_minus_1 + m_k*0.5;
@@ -98,7 +98,6 @@ function [x_k_k, P_k_k, alpha_k_k, beta_k_k, theta_k_k, Theta_k_k, EX_k_k] =  dr
         delta = 0; Delta = 0;
         T_dot_theta = rotationMatrixD(TH*theta_k_k);
         T_theta = rotationMatrix(TH*theta_k_k);
-        E_sX_1 = diag(alpha_k_k./(beta_k_k*s));
 
         for j = 1:m_k
             % Delta and delta accumulate orientation-related terms
